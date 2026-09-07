@@ -1,40 +1,203 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>问卷测试页面</title>
     <style>
-        body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
-        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        h1 { color: #333; margin-bottom: 10px; }
-        .status { color: #28a745; font-weight: bold; margin-bottom: 20px; }
-        label { display: block; margin: 15px 0 5px; color: #555; }
-        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
-        button { margin-top: 20px; padding: 12px 30px; background: #0969da; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
-        button:hover { background: #0550ae; }
-        .note { margin-top: 20px; padding: 10px; background: #fff3cd; border-radius: 6px; font-size: 13px; color: #856404; }
-    </style>
+        body {
+            font-family: -apple-system, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+    .card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .status {
+        color: #28a745;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin: 15px 0 5px;
+        color: #555;
+    }
+
+    input,
+    textarea,
+    select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+    button {
+        margin-top: 20px;
+        padding: 12px 30px;
+        background: #0969da;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background: #0550ae;
+    }
+
+    button:disabled {
+        background: #999;
+        cursor: not-allowed;
+    }
+
+    .message {
+        margin-top: 20px;
+        padding: 10px;
+        border-radius: 6px;
+        display: none;
+    }
+
+    .success {
+        display: block;
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .error {
+        display: block;
+        background: #f8d7da;
+        color: #721c24;
+    }
+</style>
+
 </head>
+
 <body>
-    <div class="card">
-        <h1>📋 GitHub Pages 部署测试</h1>
-        <p class="status">✅ 如果你能看到这个页面，说明部署成功！</p>
-        
-        <form onsubmit="event.preventDefault(); alert('测试提交成功！\n\n当前仅为前端测试，尚未连接后端服务。');">
-            <label for="name">您的姓名</label>
-            <input type="text" id="name" placeholder="请输入姓名">
-            
-            <label for="feedback">测试反馈</label>
-            <textarea id="feedback" rows="3" placeholder="随便写点什么..."></textarea>
-            
-            <button type="submit">测试提交</button>
-        </form>
-        
-        <div class="note">
-            💡 <strong>提示：</strong>此表单目前仅弹出提示框，不会真正发送数据。
-            确认部署成功后，下一步我们将接入 Formspree 等后端服务。
-        </div>
-    </div>
+
+<div class="card">
+
+<h1>📋 问卷测试</h1>
+
+<p class="status">✅ 前端页面运行正常</p>
+
+<form id="questionnaireForm">
+
+    <label for="rating">评分</label>
+    <select id="rating" required>
+        <option value="">请选择评分</option>
+        <option value="1">1 分</option>
+        <option value="2">2 分</option>
+        <option value="3">3 分</option>
+        <option value="4">4 分</option>
+        <option value="5">5 分</option>
+    </select>
+
+    <label for="gender">性别</label>
+    <select id="gender" required>
+        <option value="">请选择</option>
+        <option value="男">男</option>
+        <option value="女">女</option>
+        <option value="武装直升机">武装直升机</option>
+    </select>
+
+    <button type="submit" id="submitButton">
+        提交问卷
+    </button>
+
+</form>
+
+<div id="message" class="message"></div>
+
+</div>
+
+<script>
+
+const API_URL = "http://127.0.0.1:8000/api/questionnaire";
+
+const form = document.getElementById("questionnaireForm");
+const button = document.getElementById("submitButton");
+const message = document.getElementById("message");
+
+form.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    button.disabled = true;
+    button.textContent = "提交中...";
+
+    message.className = "message";
+    message.textContent = "";
+
+    // 每次生成一个新的 UUID
+    const deviceId = crypto.randomUUID();
+
+    const data = {
+        device_id: deviceId,
+        rating: Number(document.getElementById("rating").value),
+        gender: document.getElementById("gender").value
+    };
+
+    try {
+
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+
+            message.className = "message success";
+            message.textContent = "✅ " + result.message;
+
+            form.reset();
+
+        } else {
+
+            message.className = "message error";
+            message.textContent = "❌ 提交失败：" +
+                (result.detail || "未知错误");
+        }
+
+    } catch (error) {
+
+        message.className = "message error";
+        message.textContent =
+            "❌ 无法连接到服务器，请确认 FastAPI 正在运行。";
+
+        console.error(error);
+
+    } finally {
+
+        button.disabled = false;
+        button.textContent = "提交问卷";
+    }
+
+});
+
+</script>
+
 </body>
 </html>
