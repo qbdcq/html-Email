@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问卷测试页面</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; background: #f5f5f5; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 10px; }
+        .status { color: #28a745; font-weight: bold; margin-bottom: 20px; }
+        label { display: block; margin: 15px 0 5px; color: #555; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 12px 30px; background: #0969da; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0550ae; }
+        .note { margin-top: 20px; padding: 10px; background: #fff3cd; border-radius: 6px; font-size: 13px; color: #856404; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>📋 GitHub Pages 部署测试</h1>
+        <p class="status">✅ 如果你能看到这个页面，说明部署成功！</p>
+        
+        <form onsubmit="event.preventDefault(); alert('测试提交成功！\n\n当前仅为前端测试，尚未连接后端服务。');">
+            <label for="name">您的姓名</label>
+            <input type="text" id="name" placeholder="请输入姓名">
+            
+            <label for="feedback">测试反馈</label>
+            <textarea id="feedback" rows="3" placeholder="随便写点什么..."></textarea>
+            
+            <button type="submit">测试提交</button>
+        </form>
+        
+        <div class="note">
+            💡 <strong>提示：</strong>此表单目前仅弹出提示框，不会真正发送数据。
+            确认部署成功后，下一步我们将接入 Formspree 等后端服务。
+        </div>
+    </div>
+</body>
+</html>
