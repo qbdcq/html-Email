@@ -4,15 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>问卷测试页面</title>
-    <style>
-        body {
-            font-family: -apple-system, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
+    <title>调查问卷</title>
+
+<style>
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 20px;
+        background: #f5f5f5;
+    }
 
     .card {
         background: white;
@@ -29,27 +30,56 @@
     .status {
         color: #28a745;
         font-weight: bold;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
     }
 
-    label {
+    .question {
+        margin-top: 25px;
+    }
+
+    .question-title {
         display: block;
-        margin: 15px 0 5px;
-        color: #555;
+        margin-bottom: 12px;
+        color: #333;
+        font-weight: bold;
+        font-size: 16px;
     }
 
-    input,
-    textarea,
-    select {
-        width: 100%;
-        padding: 10px;
+    .options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .option {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 6px;
-        box-sizing: border-box;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .option:hover {
+        background: #f5f8ff;
+        border-color: #0969da;
+    }
+
+    .option input[type="radio"] {
+        width: 18px;
+        height: 18px;
+        margin: 0 10px 0 0;
+        cursor: pointer;
+    }
+
+    .option span {
+        cursor: pointer;
     }
 
     button {
-        margin-top: 20px;
+        width: 100%;
+        margin-top: 25px;
         padding: 12px 30px;
         background: #0969da;
         color: white;
@@ -94,29 +124,65 @@
 
 <div class="card">
 
-<h1>📋 问卷测试</h1>
+<h1>📋 调查问卷</h1>
 
-<p class="status">✅ 前端页面运行正常</p>
+<p class="status">请根据实际情况选择</p>
 
 <form id="questionnaireForm">
 
-    <label for="rating">评分</label>
-    <select id="rating" required>
-        <option value="">请选择评分</option>
-        <option value="1">1 分</option>
-        <option value="2">2 分</option>
-        <option value="3">3 分</option>
-        <option value="4">4 分</option>
-        <option value="5">5 分</option>
-    </select>
+    <!-- 评分 -->
+    <div class="question">
+        <label class="question-title">1. 请为本次体验评分</label>
 
-    <label for="gender">性别</label>
-    <select id="gender" required>
-        <option value="">请选择</option>
-        <option value="男">男</option>
-        <option value="女">女</option>
-        <option value="武装直升机">武装直升机</option>
-    </select>
+        <div class="options">
+            <label class="option">
+                <input type="radio" name="rating" value="1" required>
+                <span>1 分</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="rating" value="2">
+                <span>2 分</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="rating" value="3">
+                <span>3 分</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="rating" value="4">
+                <span>4 分</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="rating" value="5">
+                <span>5 分</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- 性别 -->
+    <div class="question">
+        <label class="question-title">2. 您的性别</label>
+
+        <div class="options">
+            <label class="option">
+                <input type="radio" name="gender" value="男" required>
+                <span>男</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="gender" value="女">
+                <span>女</span>
+            </label>
+
+            <label class="option">
+                <input type="radio" name="gender" value="武装直升机">
+                <span>武装直升机</span>
+            </label>
+        </div>
+    </div>
 
     <button type="submit" id="submitButton">
         提交问卷
@@ -130,7 +196,7 @@
 
 <script>
 
-const API_URL = "http://127.0.0.1:8000/api/questionnaire";
+const API_URL = "https://questionnaire-api-1.onrender.com/api/questionnaire";
 
 const form = document.getElementById("questionnaireForm");
 const button = document.getElementById("submitButton");
@@ -151,8 +217,11 @@ form.addEventListener("submit", async function(event) {
 
     const data = {
         device_id: deviceId,
-        rating: Number(document.getElementById("rating").value),
-        gender: document.getElementById("gender").value
+        rating: Number(
+            document.querySelector('input[name="rating"]:checked').value
+        ),
+        gender:
+            document.querySelector('input[name="gender"]:checked').value
     };
 
     try {
@@ -177,7 +246,8 @@ form.addEventListener("submit", async function(event) {
         } else {
 
             message.className = "message error";
-            message.textContent = "❌ 提交失败：" +
+            message.textContent =
+                "❌ 提交失败：" +
                 (result.detail || "未知错误");
         }
 
@@ -185,7 +255,7 @@ form.addEventListener("submit", async function(event) {
 
         message.className = "message error";
         message.textContent =
-            "❌ 无法连接到服务器，请确认 FastAPI 正在运行。";
+            "❌ 无法连接到服务器，请稍后再试。";
 
         console.error(error);
 
